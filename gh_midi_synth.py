@@ -1,25 +1,26 @@
 import pygame
+from pygame import midi
 pygame.init()
-pygame.midi.init()
+midi.init()
 joystick = pygame.joystick.Joystick(0)
 joystick.init()
 
-for i in range(pygame.midi.get_count):
-    print(pygame.midi.get_device_info(i))
+for i in range(pygame.midi.get_count()):
+    print(i,pygame.midi.get_device_info(i))
+midiOut = midi.Output(18)
 
-poly = False
-forceful_octave_shift = False
+forceful_octave_shift = True
 
 octave_shift = 0
 sharp_shift = False
-base_note = 58
+base_note = 55
 
 note_mappings = [0] * 5
 
 scales = {
     "minor": {
         "standard": [-2,0,3,5,7],
-        "shift": [-1, 2, 4, 6, 9],
+        "shift": [-1, 2, 4, 6, 8],
     }
 }
 
@@ -39,12 +40,12 @@ def play_note(button):
     if note_mappings[button] != 0:
         release_note(button)
     #calculate note
-    note =  base_note + 
+    note =  (base_note + 
             (active_scale["standard"] if not sharp_shift else active_scale["shift"])[button] +
-            12 * octave_shift
+            12 * octave_shift)
     #re-save this button's note mapping
     note_mappings[button] = note
-    pygame.midi.Output.note_on(note)
+    midiOut.note_on(note, 100)
 
 def release_note(button):
     button = unconfuse(button)
@@ -53,29 +54,64 @@ def release_note(button):
     if note == 0:
         print("unable to release button")
         return
-    pygame.midi.Output.note_off(note)
+    midiOut.note_off(note)
     note_mappings[button] = 0
 
+def refresh_notes():
+	for i in range(5):
+		if note_mappings[unconfuse(i)] != 0:
+			release_note(i)
+			play_note(i)
+
+def get_highest_note():
+	for i in reversed(range(5)):
+		if note_mappings[unconfuse(i)] != 0:
+			return unconfuse(i)
+	return None
+
+def pitch_bend(value):
+	midiOut.pitch_bend(value)
 
 while True:
-    get input
-    if keyChange:
-        for event in pygame.event.get():
-            print(event, event.type)
-            
-            #process strummer position (octave shift)
-            if event.type == 9:
-                if event.value[0] == 0:
-                    octave_shift = event.value[1]
 
-            #button pressed
-            if event.type == 10:
-                #if a note button was pressed
-                if event.button in range(5):
-                    play_note(event.button)
+    for event in pygame.event.get():
+        #print(event, event.type)
+        
+        #process strummer position (octave shift)
+        if event.type == pygame.JOYHATMOTION:
+            if event.value[0] == 0:
+                octave_shift = event.value[1]
+                if forceful_octave_shift:
+                	refresh_notes()
 
-                #if the star power button was pressed
-                if event.button == 6:
-                    sharp_shift = True
-            if keyReleased:
-                process_input
+        #button pressed
+        if event.type == pygame.JOYBUTTONDOWN:
+            #if a note button was pressed
+            if event.button in range(5):
+                play_note(event.button)
+
+            #if the star power button was pressed
+            if event.button == 6:
+                sharp_shift = True
+                if not poly:
+                	refresh_notes()
+
+        if event.type == pygame.JOYBUTTONUP:
+            #if a note button was released
+            if event.button in range(5):
+                release_note(event.button)
+
+            #if the star power button was released
+            if event.button == 6:
+                sharp_shift = False
+                if not poly:
+                	refresh_notes()
+        #tilt or whammy
+        if event.type == pygame.JOYAXISMOTION:
+        	if event.axis == 3 and not poly:
+        		pitch_bend(int((event.value + 1)*1650))
+
+                
+
+
+midi.quit()
