@@ -5,7 +5,15 @@ scales = {
 		"standard": [-2,0,3,5,7],
 		"chord": ["M", "m", "M", "m", "m"],
 		"shift": [-1, 2, 4, 6, 9],
-		"base_note": 57
+		"base_note": 57,
+		"octave_shift": -12,
+	},
+	"as_no_shame": {
+		"standard": [-2,0,3,5,7],
+		"octave": [-7, -5, -2, 2, 3],
+		"chord": ["M", "m", "M", "m", "m"],
+		"shift": [-1, 2, 4, 6, 9],
+		"base_note": 57,
 	}
 }
 
@@ -18,7 +26,7 @@ class gh_midi_synth:
 		self.midiOut = midi.Output(midi_port)
 
 		#if forceful_shift is true, the octaver will "jump" the note instead of cutting it
-		self.forceful_shift = False
+		self.forceful_shift = True
 		self.octave_shift = 0
 		#star power button, shifts up either 1 or 2 semitones
 		self.sharp_shift = False
@@ -45,6 +53,10 @@ class gh_midi_synth:
 		return button
 
 	def calc_note(self, button):
+		if "octave" in self.active_scale:
+			return (self.active_scale["base_note"] + 
+				(self.active_scale["standard"] if not self.octave_shift else self.active_scale["octave"])[button] + 
+				(12 if self.octave_shift == 1 else 0))
 		return (self.active_scale["base_note"] + 
 				(self.active_scale["standard"] if not self.sharp_shift else self.active_scale["shift"])[button] +
 				12 * self.octave_shift)
@@ -175,6 +187,7 @@ class gh_midi_synth:
 		while True:
 			for event in pygame.event.get():
 				#process strummer position (octave shift)
+				print(event)
 				if event.type == pygame.JOYHATMOTION:
 					if event.value[0] == 0:
 						self.octave_shift = event.value[1]
