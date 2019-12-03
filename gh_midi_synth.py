@@ -264,8 +264,9 @@ class gh_midi_synth:
 				#print("pressed_buttons", self.pressed_buttons)
 				#print("note mappings", self.button_mappings)
 				#print(event, event.type)
-				
+				if event.type == 12:
+					fail()
 if __name__ == "__main__":
-	controller = gh_midi_synth(0,18)
+	controller = gh_midi_synth(0,5)
 	controller.run()
 	midi.quit()
