@@ -1,8 +1,10 @@
 from gh_controller import gh_controller
 from midi_notes import noteController
 
-GHController = gh_controller(0)
-MidiController = noteController(3)
+CONTROLLER_NUMBER = 0
+MIDI_PORT_NUMBER = 3
+GHController = gh_controller(CONTROLLER_NUMBER)
+MidiController = noteController(MIDI_PORT_NUMBER)
 
 #helper functions to release and re-engage all notes, 
 #used to refresh when changing things

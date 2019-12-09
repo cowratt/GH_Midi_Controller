@@ -1,6 +1,8 @@
 import pygame
 from pygame import midi
 
+PITCH_BEND_SCALE= 1650
+
 '''
 This file contains lots of vaugely generic midi controller code.
 This can hopefully be used for all sorts of midi controllers.
@@ -97,7 +99,6 @@ class noteTranslater:
 
 
 class notePlayer:
-	PITCH_BEND_SCALE= 1650
 	def __init__(self, port):
 		pygame.init()
 		midi.init()
@@ -111,7 +112,7 @@ class notePlayer:
 		self.midiOut.note_off(note, channel=channel)
 	def pitchBend(self, bend_amt):
 		#takes a value between 1 and -1
-		v = int((bend_amt + 1) * self.PITCH_BEND_SCALE)
+		v = int((bend_amt + 1) * PITCH_BEND_SCALE)
 		self.midiOut.pitch_bend(v)
 
 class noteController(noteTranslater, notePlayer):
