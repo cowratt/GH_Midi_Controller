@@ -5,7 +5,7 @@ It provides easy callbacks for buttons on the guitar hero controller.
 
 import pygame
 class gh_controller:
-	#callbacks
+	#callbacks. Hook these up to a midi controller or any other project
 	doNothing = lambda *args, **kwargs: None
 	noteButtonPressedCallback = doNothing
 	noteButtonReleasedCallback = doNothing
@@ -105,7 +105,7 @@ class gh_controller:
 					fail()
 	@staticmethod
 	def unconfuse(button):
-
+		#by default buttons 2 and 3 are not in order
 		if button == 3:
 			return 2
 		if button == 2:
