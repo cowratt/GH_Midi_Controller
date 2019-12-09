@@ -9,9 +9,13 @@ MidiController = noteController(3)
 def releaseAll():
     for i in GHController.activeNotes():
         MidiController.releaseNote(i)
+    if GHController.pressed_pad != None:
+        MidiController.releaseChord(GHController.pressed_pad)
 def updateAll():
     for i in GHController.activeNotes():
         MidiController.playNote(i)
+    if GHController.pressed_pad != None:
+        MidiController.playChord(GHController.pressed_pad)
 
 
 def notePressed(controllerButton):
@@ -21,6 +25,14 @@ def notePressed(controllerButton):
 def noteReleased(controllerButton):
     print("note released:", controllerButton)
     MidiController.releaseNote(controllerButton)
+
+def chordPressed(controllerButton):
+    print("chord pressed:", controllerButton)
+    MidiController.playChord(controllerButton)
+
+def chordReleased(controllerButton):
+    print("chord released:", controllerButton)
+    MidiController.releaseChord(controllerButton)
 
 def buttonPressed(controllerButton):
     print("button pressed:", controllerButton)
@@ -50,8 +62,11 @@ def strumChanged(controllerButton):
     MidiController.octaveShift = controllerButton
     updateAll()
 
+#set up callbacks
 GHController.noteButtonPressedCallback = notePressed
 GHController.noteButtonReleasedCallback = noteReleased
+GHController.neckPadPressedCallback = chordPressed
+GHController.neckPadReleasedCallback = chordReleased
 GHController.otherButtonPressedCallback = buttonPressed
 GHController.otherButtonReleasedCallback = buttonReleased
 GHController.pitchBendCallback = pitchBend

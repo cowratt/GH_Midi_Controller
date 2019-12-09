@@ -15,7 +15,7 @@ and the notePlayer plays or releases a given note, ignoring state
 scale =  {
 	"standard": [-2,0,3,5,7],
 	"chord": ["M", "m", "M", "m", "m"],
-	"shift": [-1, 2, 4, 6, 9],
+	"shift": [-1, 2, 4, 6, 8],
 	"shiftChord": ["dom7", "m", "dom7", "maj7", "M"],
 	"base_note": 57,
 }
@@ -40,7 +40,7 @@ class noteTranslater:
 	def calcChord(self, noteNumber):
 		scale = self.scale['chord'] if not self.noteShift else self.scale['shiftChord']
 		chord = scale[noteNumber]
-		note = self.calc_note(noteNumber) - 12
+		note = self.calcNote(noteNumber) - 12
 		if self.altered_chord:
 			chord = "min7" if chord == "m" else "dom7"
 		#calculate chord mappings
@@ -107,7 +107,8 @@ class notePlayer:
 		print("note on:", note)
 		self.midiOut.note_on(note, velocity, channel)
 	def noteOff(self, note, channel=0, velocity=None):
-		self.midiOut.note_off(note,)
+		print("note off:", note)
+		self.midiOut.note_off(note, channel=channel)
 	def pitchBend(self, bend_amt):
 		#takes a value between 1 and -1
 		v = int((bend_amt + 1) * self.PITCH_BEND_SCALE)
