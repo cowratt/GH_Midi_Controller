@@ -1,9 +1,9 @@
-# Guitar Hero Midi Synth
-This package turns an xbox 360 guitar hero controller into a full-blown midi controller complete with chords, pitch-bending, and more!
+# Guitar Hero Midi Controller
+This package turns an xbox 360 guitar hero controller into a full-blown midi controller complete with chords, pitch-bending, and all sorts of groovy things!
 
 ![Controls](/controls.jpg)
 
-### WARNING: I am not a music theory expert. Please forgive any mistakes that I may have made.
+### WARNING: I am not a music theory expert. Please forgive any theory errors.
 
 ## Getting started
  * `pip install pygame==2.0.0.dev6` (or newer)
@@ -11,7 +11,7 @@ This package turns an xbox 360 guitar hero controller into a full-blown midi con
  * install loopMidi and create a virtual port.
  * `python main.py`
 
-By default, it looks for a controller on port 0, and a midi connection on port 3, but both of these can be set in main.py.
+The software looks for a controller on port 0, and a midi connection on port 3, but both of these can be set in main.py.
 
 ## Playing Notes:
 By default, the face buttons correspond to the notes in the Pentatonic scale with the minor root being on the 2nd note (Red), and the major root being on the third note(yellow). The strum bar can be used to shift +/- 1 octave. The large wide star power button can be used to shift any given note up to the next "inbetween" note in the scale. For example, it would shift the minor 1 to a minor 2. In cases where there are no actual scale notes between two notes, such as between blue, the minor 4th, and orange, the minor 5th, it just plays the note halfway between, which in this example would be the "blues note".
