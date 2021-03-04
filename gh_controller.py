@@ -19,6 +19,7 @@ class gh_controller:
 	pitchBendCallback = doNothing
 	tiltNeckCallback = doNothing
 	strumChangedCallback = doNothing
+	transposeCallback = doNothing
 
 	pressed_buttons = [False] * 12
 	pressed_pad = None
@@ -47,10 +48,12 @@ class gh_controller:
 		while True:
 			for event in pygame.event.get():
 				#process strummer position (octave shift)
-				print(event)
+				#print(event)
 				if event.type == pygame.JOYHATMOTION:
 					if event.value[0] == 0:
 						self.strumChangedCallback(event.value[1])
+					if event.value[1] == 0:
+						self.transposeCallback(event.value[0])
 				#button pressed
 				if event.type == pygame.JOYBUTTONDOWN:
 					self.pressed_buttons[self.unconfuse(event.button)] = True

@@ -1,3 +1,5 @@
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 from pygame import midi
 
@@ -136,3 +138,6 @@ class noteController(noteTranslater, notePlayer):
 		for note in chord:
 			self.noteOff(note, channel=1)
 		pass
+
+	def transpose(self, transposeAmount):
+		self.base_note += transposeAmount

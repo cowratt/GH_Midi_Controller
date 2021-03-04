@@ -1,10 +1,10 @@
 from gh_controller import gh_controller
 from midi_notes import noteController
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+from pygame import midi, joystick
 
-CONTROLLER_NUMBER = 0
-MIDI_PORT_NUMBER = 3
-GHController = gh_controller(CONTROLLER_NUMBER)
-MidiController = noteController(MIDI_PORT_NUMBER)
+
 
 #helper functions to release and re-engage all notes, 
 #used to refresh when changing things
@@ -37,6 +37,7 @@ def chordReleased(controllerButton):
     MidiController.releaseChord(controllerButton)
 
 def buttonPressed(controllerButton):
+    print("ButtonPressed:", controllerButton)
     print("button pressed:", controllerButton)
     releaseAll()
     if(controllerButton == 6): #star power button
@@ -57,6 +58,10 @@ def pitchBend(bendAmount):
     print("pitch:", bendAmount)
     MidiController.pitchBend(bendAmount)
 
+def transpose(transposeValue):
+	print("transpose:", transposeValue)
+	MidiController.transpose(transposeValue)
+
 def strumChanged(controllerButton):
     print("strum:", controllerButton)
     #forceful octave shift: release notes add shift, bring notes back
@@ -64,14 +69,53 @@ def strumChanged(controllerButton):
     MidiController.octaveShift = controllerButton
     updateAll()
 
-#set up callbacks
-GHController.noteButtonPressedCallback = notePressed
-GHController.noteButtonReleasedCallback = noteReleased
-GHController.neckPadPressedCallback = chordPressed
-GHController.neckPadReleasedCallback = chordReleased
-GHController.otherButtonPressedCallback = buttonPressed
-GHController.otherButtonReleasedCallback = buttonReleased
-GHController.pitchBendCallback = pitchBend
-GHController.strumChangedCallback = strumChanged
+if __name__ == "__main__":
+	midi.init()
+	print("Conrad Menchine's GH Midi Interface.\n",
+		  "Available devices:")
 
-GHController.run()
+	for i in range(midi.get_count()):
+		info = midi.get_device_info(i)
+		if(info[3]):
+			print(str(i) + ": " + info[1].decode())
+
+	read_input = True
+	print("Which Midi output do you want to use? (Enter a number)")
+	while read_input:
+		try:
+			MIDI_PORT_NUMBER = int(input("> "))
+			read_input = False
+		except:
+			print("Invalid input. Please enter a number.")
+
+
+
+	CONTROLLER_NUMBER = 0
+	print("Using Controller", CONTROLLER_NUMBER)
+	joystick.init()
+	num_connected_controllers = joystick.get_count()
+	if num_connected_controllers == 0:
+		raise Exception("No Controllers found. Please Connect a controller and restart this program.")
+	elif num_connected_controllers == 1:
+		print("One controller found. Using it.")
+	else:
+		print("There are", joystick.get_count(), "controllers connected:")
+		for i in range(num_connected_controllers):
+			print(i + ": " + joystick.Joystick(i).get_name())
+
+
+
+	GHController = gh_controller(CONTROLLER_NUMBER)
+	MidiController = noteController(MIDI_PORT_NUMBER)
+	#set up callbacks
+	GHController.noteButtonPressedCallback = notePressed
+	GHController.noteButtonReleasedCallback = noteReleased
+	GHController.neckPadPressedCallback = chordPressed
+	GHController.neckPadReleasedCallback = chordReleased
+	GHController.otherButtonPressedCallback = buttonPressed
+	GHController.otherButtonReleasedCallback = buttonReleased
+	GHController.pitchBendCallback = pitchBend
+	GHController.strumChangedCallback = strumChanged
+	GHController.transposeCallback = transpose
+
+	GHController.run()
